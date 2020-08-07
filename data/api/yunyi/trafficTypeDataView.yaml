@@ -1,0 +1,63 @@
+traffic_typ_dataview:
+  desc: 手机 、微信、qq 流量占比接口
+  url: https://data-report-test.shiguangkey.com/data-report/indicators/trafficTypeDataView
+  method: get
+  header:
+    token: $<token>
+  data:
+    startTime: 1583424000000
+    endTime: 1583510399000
+  sql: select sum(la.apply_no) apply_num,la.gather_type, la.alloc_date
+       from dm.dm_customer_learning_apply_info la
+       where la.alloc_date = '2020-03-06' and la.gather_type is not null
+       group by la.gather_type, la.alloc_date order by la.gather_type;
+  check:
+    status: 0
+    msg: 成功
+    rows: [{"flowNum":0,"flowType":1},{"flowNum":0,"flowType":2},{"flowNum":0,"flowType":3}]
+
+
+traffic_trend_dataview:
+  desc: 流量申请趋接口
+  url: https://data-report-test.shiguangkey.com/data-report/indicators/trafficTrendDataView
+  method: get
+  header:
+    token: $<token>
+  data:
+    startTime: 1583424000000
+    endTime: 1583510399000
+    type: 1
+  sql: select sum(la.apply_no) apply_num,alloc_date
+       from dm.dm_customer_learning_apply_info la
+       where la.alloc_date <= '2020-03-06'
+       and la.alloc_date >= date_add('2020-03-06', interval -6 day)
+       and la.promotion_department_name = '天府一院'
+       group by la.promotion_department_name, la.alloc_date
+       order by alloc_date desc
+  check:
+    status: 0
+    msg: 成功
+    data: [
+             {"day":"2020-07-31","num":0},{"day":"2020-08-01","num":0},
+             {"day":"2020-08-02","num":0},{"day":"2020-08-03","num":0},
+             {"day":"2020-08-04","num":0},{"day":"2020-08-05","num":0},
+             {"day":"2020-08-06","num":0}
+    ]
+
+traffic_trend_group_dataview:
+  desc: 流量申请趋接口
+  url: https://data-report-test.shiguangkey.com/data-report/indicators/trafficTrendGroupDataView
+  method: get
+  header:
+    token: $<token>
+  data:
+    startTime: 1583424000000
+    endTime: 1583510399000
+    type: 1
+  sql: select la.promotion_department_id orgId, la.promotion_department_name  orgName, sum(la.apply_no) num
+       from dm.dm_customer_learning_apply_info la
+       where la.alloc_date = '2020-03-06' and la.promotion_department_name = '天府一院'
+       group by la.promotion_department_name
+  check:
+    status: 0
+    msg: 成功
